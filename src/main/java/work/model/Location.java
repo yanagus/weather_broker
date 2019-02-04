@@ -59,7 +59,7 @@ public class Location implements Serializable {
     /**
      * Долгота
      */
-    @Column(name = "long")
+    @Column(name = "lon")
     private Double longitude;
 
     /**

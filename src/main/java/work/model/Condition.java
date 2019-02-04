@@ -7,6 +7,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.MapsId;
 import javax.persistence.OneToOne;
+import javax.persistence.Table;
 import javax.persistence.Version;
 import java.io.Serializable;
 import java.util.Objects;
@@ -15,6 +16,7 @@ import java.util.Objects;
  * Текущее состояние погоды
  */
 @Entity
+@Table(name = "Condit")
 public class Condition implements Serializable {
 
     /**
