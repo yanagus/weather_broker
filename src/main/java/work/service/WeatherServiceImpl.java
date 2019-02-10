@@ -22,7 +22,8 @@ import work.view.LocationView;
 import work.view.WeatherInfoView;
 import work.view.WindView;
 
-import java.util.Date;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 /**
@@ -68,28 +69,30 @@ public class WeatherServiceImpl implements WeatherService {
         }
         int size = location.getCurrentObservations().size();
         CurrentObservation currentObservation = location.getCurrentObservations().get(size - 1);
-        if(currentObservation.getPubDate() == null || comparePubDates(currentObservation.getPubDate()) > 6) {
+        if(currentObservation.getPubDate() == null || comparePubDates(currentObservation.getPubDate(), location) > 6) {
             return null;
         }
 
         WeatherInfoView weatherInfo = new WeatherInfoView();
         weatherInfo.setLocation(new LocationView(location));
-        weatherInfo.setCurrentObservation(getCurrentObservationView(currentObservation));
+        weatherInfo.setCurrentObservation(getCurrentObservationView(currentObservation, weatherInfo.getLocation()));
         List<Forecast> forecasts = location.getForecasts();
         for (Forecast forecast : forecasts) {
             ForecastView forecastView = new ForecastView(forecast);
+            forecastView.setLocation(weatherInfo.getLocation());
+            forecastView.setZonedDateTime();
             weatherInfo.getForecasts().add(forecastView);
         }
         return weatherInfo;
     }
 
-    private int comparePubDates(Date lastDate) {
-        Date dateNow = new Date();
-        long difference = dateNow.getTime() - lastDate.getTime();
+    private int comparePubDates(Integer lastDate, Location location) {
+        ZonedDateTime now = ZonedDateTime.now(ZoneId.of(location.getTimezone()));
+        long difference = now.toEpochSecond() - lastDate;
         return (int)(difference / (60 * 60 * 1000));
     }
 
-    private CurrentObservationView getCurrentObservationView(CurrentObservation currentObservation) {
+    private CurrentObservationView getCurrentObservationView(CurrentObservation currentObservation, LocationView location) {
         CurrentObservationView currentObservationView = new CurrentObservationView(currentObservation.getPubDate(),
                                                                                     null);
 
@@ -116,6 +119,9 @@ public class WeatherServiceImpl implements WeatherService {
                 currentObservation.getWind().getSpeed(),
                 currentObservationView);
         currentObservationView.setWind(wind);
+
+        currentObservationView.setLocation(location);
+        currentObservationView.setDate();
 
         return currentObservationView;
     }

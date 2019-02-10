@@ -11,11 +11,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.persistence.Version;
 import java.io.Serializable;
-import java.util.Date;
 import java.util.Objects;
 
 /**
@@ -66,8 +63,7 @@ public class CurrentObservation implements Serializable {
      * Дата и время публикации этого прогноза
      */
     @Column(name = "pub_date")
-    @Temporal(TemporalType.DATE)
-    private Date pubDate;
+    private Integer pubDate;
 
     /**
      * Местоположение, город
@@ -79,9 +75,9 @@ public class CurrentObservation implements Serializable {
     public CurrentObservation() {
     }
 
-    public CurrentObservation(Date pubDate, Location location) {
-        this.pubDate = pubDate;
+    public CurrentObservation(Location location, Integer pubDate) {
         this.location = location;
+        this.pubDate = pubDate;
     }
 
     public Integer getId() {
@@ -124,16 +120,12 @@ public class CurrentObservation implements Serializable {
         this.condition = condition;
     }
 
-    public Date getPubDate() {
+    public Integer getPubDate() {
         return pubDate;
     }
 
-    public void setPubDate(Date pubDate) {
+    public void setPubDate(Integer pubDate) {
         this.pubDate = pubDate;
-    }
-
-    public void setPubDate(int number) {
-        this.pubDate = new Date((long) number*1000);
     }
 
     public Location getLocation() {

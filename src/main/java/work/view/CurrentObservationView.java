@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Objects;
 
 /**
@@ -41,7 +43,12 @@ public class CurrentObservationView implements Serializable {
     /**
      * Дата и время публикации этого прогноза
      */
-    private Date pubDate;
+    private ZonedDateTime date;
+
+    /**
+     * Дата и время публикации этого прогноза в миллисекундах
+     */
+    private Integer pubDate;
 
     /**
      * Местоположение, город
@@ -52,7 +59,7 @@ public class CurrentObservationView implements Serializable {
     public CurrentObservationView() {
     }
 
-    public CurrentObservationView(Date pubDate, LocationView location) {
+    public CurrentObservationView(Integer pubDate, LocationView location) {
         this.pubDate = pubDate;
         this.location = location;
     }
@@ -97,16 +104,26 @@ public class CurrentObservationView implements Serializable {
         this.condition = condition;
     }
 
-    public Date getPubDate() {
+    public ZonedDateTime getDate() {
+        return date;
+    }
+
+    public void setDate(ZonedDateTime date) {
+        this.date = date;
+    }
+
+    public void setDate() {
+        if (location != null) {
+            this.date = ZonedDateTime.ofInstant(Instant.ofEpochMilli((long) pubDate*1000), ZoneId.of(location.getTimezone()));
+        }
+    }
+
+    public Integer getPubDate() {
         return pubDate;
     }
 
-    public void setPubDate(Date pubDate) {
+    public void setPubDate(Integer pubDate) {
         this.pubDate = pubDate;
-    }
-
-    public void setPubDate(int number) {
-        this.pubDate = new Date((long) number*1000);
     }
 
     public LocationView getLocation() {

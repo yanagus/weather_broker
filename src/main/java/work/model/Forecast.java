@@ -10,11 +10,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.persistence.Version;
 import java.io.Serializable;
-import java.util.Date;
 import java.util.Objects;
 
 /**
@@ -47,8 +44,7 @@ public class Forecast implements Serializable {
      * Дата
      */
     @Column(name = "date")
-    @Temporal(TemporalType.DATE)
-    private Date date;
+    private Integer date;
 
     /**
      * Минимальная температура воздуха для данного дня, в градусах Цельсия
@@ -84,9 +80,9 @@ public class Forecast implements Serializable {
     public Forecast() {
     }
 
-    public Forecast(String day, Date date, Byte low, Byte high, String text, Short code) {
+    public Forecast(String day, Integer date, Byte low, Byte high, String text, Short code) {
         this.day = day;
-        setDate(date);
+        this.date = date;
         this.low = low;
         this.high = high;
         this.text = text;
@@ -114,17 +110,14 @@ public class Forecast implements Serializable {
         this.day = day;
     }
 
-    public Date getDate() {
+    public Integer getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(Integer date) {
         this.date = date;
     }
 
-    public void setDate(int number) {
-        this.date = new Date((long) number*1000);
-    }
 
     public Byte getLow() {
         return low;

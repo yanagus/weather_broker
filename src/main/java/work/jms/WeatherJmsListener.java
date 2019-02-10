@@ -81,12 +81,8 @@ public class WeatherJmsListener {
         if (locationOptional.isPresent()) {
             Location locationFromDB = locationOptional.get();
             saveCurrentObservation(weatherInfo.getCurrentObservation(), locationFromDB);
-            List<Forecast> forecasts = locationFromDB.getForecasts();
-            for (Forecast forecast : forecasts) {
-                locationFromDB.removeForecast(forecast);
-            }
+            locationFromDB.getForecasts().clear();
             saveForecasts(weatherInfo.getForecasts(), locationFromDB);
-
         } else {
             Location location = new Location(weatherInfo.getLocation());
             locationRepository.save(location);
@@ -106,7 +102,7 @@ public class WeatherJmsListener {
     private void saveCurrentObservation(CurrentObservationView currentObservationView, Location location) {
         if(currentObservationView.getAstronomy() != null && currentObservationView.getAtmosphere() != null &&
                 currentObservationView.getCondition() != null && currentObservationView.getWind() != null) {
-            CurrentObservation newCurrentObservation = new CurrentObservation(currentObservationView.getPubDate(), location);
+            CurrentObservation newCurrentObservation = new CurrentObservation(location, currentObservationView.getPubDate());
             currentObservationRepository.save(newCurrentObservation);
 
             Astronomy astronomy = new Astronomy(currentObservationView.getAstronomy().getSunrise(),

@@ -13,6 +13,7 @@ import org.springframework.web.client.RestTemplate;
 
 import work.exceptionHandler.WeatherException;
 import work.jms.WeatherJmsSender;
+import work.view.ForecastView;
 import work.view.WeatherInfoView;
 
 import javax.crypto.Mac;
@@ -33,7 +34,7 @@ import java.util.Random;
 @Service
 public class YahooServiceImpl implements YahooService {
 
-    private final Logger LOGGER = LoggerFactory.getLogger(YahooServiceImpl.class);
+    private final Logger log = LoggerFactory.getLogger(YahooServiceImpl.class);
 
     private WeatherJmsSender jmsSender;
 
@@ -79,7 +80,7 @@ public class YahooServiceImpl implements YahooService {
         try {
             parameters.add("location=" + URLEncoder.encode(city + "," + region, "UTF-8"));
         } catch (UnsupportedEncodingException e) {
-            LOGGER.error("Error encoding parameter {}", e.getMessage(), e);
+            log.error("Error encoding parameter {}", e.getMessage(), e);
         }
         parameters.add("format=json");
         parameters.add("u=c");
@@ -96,7 +97,7 @@ public class YahooServiceImpl implements YahooService {
                     URLEncoder.encode(url, "UTF-8") + "&" +
                     URLEncoder.encode(parametersList.toString(), "UTF-8");
         } catch (UnsupportedEncodingException e) {
-            LOGGER.error("Error encoding parameter {}", e.getMessage(), e);
+            log.error("Error encoding parameter {}", e.getMessage(), e);
         }
 
         String signature = null;
@@ -131,6 +132,7 @@ public class YahooServiceImpl implements YahooService {
         ResponseEntity<WeatherInfoView> result = restTemplate.exchange(
                 "https://weather-ydn-yql.media.yahoo.com/forecastrss?location=" + city + "," + region + "&format=json&u=c",
                 HttpMethod.GET, entity, WeatherInfoView.class);
+        log.info("weather's requested from Yahoo");
 
         if(result.getStatusCodeValue() != 200) {
             throw new WeatherException("Service is temporarily unavailable. Try later");
@@ -145,7 +147,17 @@ public class YahooServiceImpl implements YahooService {
                 weatherInfo.getForecasts().get(0) == null) {
             throw new WeatherException("Service is temporarily unavailable. Try later");
         }
+
         jmsSender.sendWeather(weatherInfo);
+
+        weatherInfo.getCurrentObservation().setLocation(weatherInfo.getLocation());
+        weatherInfo.getCurrentObservation().setDate();
+        List<ForecastView> forecasts = weatherInfo.getForecasts();
+        for (ForecastView forecastView : forecasts) {
+            forecastView.setLocation(weatherInfo.getLocation());
+            forecastView.setZonedDateTime();
+        }
+
         return weatherInfo;
     }
 }

@@ -13,7 +13,7 @@ COMMENT 'Местоположение, город';
 CREATE TABLE IF NOT EXISTS Current_observation (
     id     INTEGER PRIMARY KEY AUTO_INCREMENT COMMENT 'Уникальный идентификатор текущего обзора погоды',
     version         INTEGER NOT NULL,
-    pub_date        TIMESTAMP COMMENT 'Дата и время публикации этого прогноза',
+    pub_date        INTEGER COMMENT 'Дата и время публикации этого прогноза в миллисекундах',
     location_id     INTEGER COMMENT 'Уникальный идентификатор города, внешний ключ'
     REFERENCES Location (woeid) ON DELETE CASCADE ON UPDATE CASCADE
 )
@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS Forecast (
     id          INTEGER  PRIMARY KEY AUTO_INCREMENT COMMENT 'Уникальный идентификатор прогноза погоды',
     version     INTEGER NOT NULL,
     day         VARCHAR(3) COMMENT 'День недели',
-    date        DATE COMMENT 'Дата',
+    date        INTEGER COMMENT 'Дата в миллисекундах',
     low         TINYINT COMMENT 'Минимальная температура',
     high        TINYINT COMMENT 'Максимальная температура',
     text        VARCHAR(25) COMMENT 'Текстовое описание состояния',
